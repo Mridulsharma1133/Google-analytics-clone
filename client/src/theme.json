@@ -1,0 +1,35 @@
+{
+  "colors": {
+    "primary":    "#4F46E5",
+    "primaryHover":"#4338CA",
+    "secondary":  "#10B981",
+    "danger":     "#EF4444",
+    "warning":    "#F59E0B",
+    "bg":         "#F9FAFB",
+    "surface":    "#FFFFFF",
+    "border":     "#E5E7EB",
+    "text":       "#111827",
+    "textMuted":  "#6B7280",
+    "sidebar":    "#1E1B4B",
+    "sidebarText":"#C7D2FE",
+    "sidebarActive":"#4F46E5"
+  },
+  "font": {
+    "family": "Inter, system-ui, sans-serif",
+    "sizeBase": "14px",
+    "sizeSm":   "12px",
+    "sizeLg":   "18px",
+    "sizeXl":   "24px"
+  },
+  "radius": {
+    "sm": "4px",
+    "md": "8px",
+    "lg": "12px"
+  },
+  "shadow": {
+    "card": "0 1px 3px rgba(0,0,0,0.08)"
+  },
+  "chart": {
+    "colors": ["#4F46E5","#10B981","#F59E0B","#EF4444","#8B5CF6","#06B6D4"]
+  }
+}

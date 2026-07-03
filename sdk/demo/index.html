@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GA SDK — Demo</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f9fafb; color: #111; }
+    header {
+      background: #1e1b4b; color: #fff;
+      padding: 16px 32px; display: flex; align-items: center; gap: 12px;
+    }
+    header span { font-size: 20px; font-weight: 700; }
+    header small { font-size: 12px; opacity: .6; }
+    main { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+    h2 { font-size: 15px; font-weight: 700; color: #1e1b4b; margin-bottom: 12px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+    .card {
+      background: #fff; border: 1px solid #e5e7eb;
+      border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.07);
+    }
+    .card p { font-size: 13px; color: #6b7280; margin-bottom: 14px; line-height: 1.5; }
+    label { display: block; font-size: 12px; color: #6b7280; margin-bottom: 3px; }
+    input, select {
+      width: 100%; padding: 7px 10px; font-size: 13px;
+      border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 10px;
+    }
+    button {
+      padding: 8px 16px; border: none; border-radius: 6px;
+      font-size: 13px; cursor: pointer; font-weight: 600;
+    }
+    .btn-primary   { background: #4f46e5; color: #fff; }
+    .btn-secondary { background: #10b981; color: #fff; }
+    .btn-warning   { background: #f59e0b; color: #fff; }
+    .btn-danger    { background: #ef4444; color: #fff; }
+    #log {
+      font-family: monospace; font-size: 12px;
+      background: #1e1b4b; color: #a5b4fc; border-radius: 8px;
+      padding: 16px; max-height: 260px; overflow-y: auto;
+    }
+    #log div { padding: 2px 0; border-bottom: 1px solid #312e81; }
+    .tag {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: 11px; font-weight: 600; margin-right: 4px;
+    }
+    .tag-auto   { background: #dbeafe; color: #1d4ed8; }
+    .tag-manual { background: #dcfce7; color: #15803d; }
+    .tag-attr   { background: #fef3c7; color: #b45309; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <span>GA SDK Demo</span><br/>
+    <small>Open DevTools Console to see debug logs</small>
+  </div>
+</header>
+
+<main>
+
+  <!-- SDK Info -->
+  <div class="card" style="margin-bottom:20px">
+    <h2 style="margin-bottom:8px">Visitor Info</h2>
+    <p>SDK auto-generates a persistent <strong>visitorId</strong> (localStorage) and a rotating <strong>sessionId</strong> (sessionStorage).</p>
+    <div id="info" style="font-size:13px; font-family:monospace; color:#4f46e5">Loading…</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- Manual Track -->
+    <div class="card">
+      <h2>Manual Event Tracking</h2>
+      <p>Use <code>tracker.track(name, props)</code> to send any custom event.</p>
+      <label>Event Name</label>
+      <input id="m-name" type="text" value="button_click" />
+      <label>Event Value (optional)</label>
+      <input id="m-value" type="number" placeholder="e.g. 10" />
+      <label>Type</label>
+      <select id="m-type">
+        <option value="count">count</option>
+        <option value="sum">sum</option>
+        <option value="unique">unique</option>
+      </select>
+      <label>Source (optional override)</label>
+      <input id="m-source" type="text" placeholder="e.g. email" />
+      <button class="btn-primary" onclick="sendManual()">Track Event</button>
+    </div>
+
+    <!-- Identify -->
+    <div class="card">
+      <h2>Identify User</h2>
+      <p>Call <code>tracker.identify(userId)</code> after login to link events to a known user.</p>
+      <label>User ID / Email</label>
+      <input id="i-uid" type="text" placeholder="user@example.com" />
+      <button class="btn-secondary" onclick="identifyUser()" style="margin-bottom:16px">Identify</button>
+
+      <h2 style="margin-top:4px">Simulate Page Navigation</h2>
+      <p>Pushes a new history entry — SDK auto-fires a <code>page_view</code> event.</p>
+      <button class="btn-warning" onclick="simulateNav()">Navigate to /checkout</button>
+    </div>
+
+  </div>
+
+  <!-- Data-attribute buttons -->
+  <div class="card" style="margin-bottom:20px">
+    <h2>Auto-track via Data Attributes</h2>
+    <p>
+      Add <code>data-ga-event</code>, <code>data-ga-value</code>, <code>data-ga-type</code>
+      to any element — clicks are captured automatically, no JS needed.
+    </p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px">
+      <button class="btn-primary"   data-ga-event="signup_click"    data-ga-value="1"    data-ga-type="count">Sign Up Click</button>
+      <button class="btn-secondary" data-ga-event="purchase"        data-ga-value="49.99" data-ga-type="sum">Purchase $49.99</button>
+      <button class="btn-warning"   data-ga-event="video_play"      data-ga-type="unique">Play Video</button>
+      <button class="btn-danger"    data-ga-event="subscription_cancel">Cancel Sub</button>
+    </div>
+  </div>
+
+  <!-- Event Log -->
+  <div class="card">
+    <h2 style="margin-bottom:10px">
+      Event Log
+      <button onclick="clearLog()" style="float:right; padding:3px 10px; background:#e5e7eb; border:none; border-radius:4px; font-size:11px; cursor:pointer">Clear</button>
+    </h2>
+    <div id="log"><div style="color:#6366f1">Waiting for events…</div></div>
+  </div>
+
+</main>
+
+<!--
+  In production use the built bundle:
+  <script src="../dist/ga-sdk.umd.js"></script>
+
+  For demo we load the src directly via type="module"
+-->
+<script type="module">
+  import tracker from "../src/index.js";
+
+  // Monkey-patch fetch to intercept & log events for the demo
+  const _origFetch = window.fetch;
+  window.fetch = async function(url, opts) {
+    if (url.includes("/events") && opts?.method === "POST") {
+      try {
+        const body = JSON.parse(opts.body);
+        logEvent(body);
+      } catch {}
+    }
+    return _origFetch.apply(this, arguments);
+  };
+
+  tracker.init({
+    endpoint:  "http://localhost:3001/api/v1",
+    autotrack: true,
+    debug:     true,
+  });
+
+  // Show visitor info
+  document.getElementById("info").textContent =
+    `visitorId: ${tracker.visitorId}   |   sessionId: ${tracker.sessionId}   |   source: ${tracker.source}`;
+
+  // Expose to inline onclick handlers
+  window.tracker = tracker;
+
+  window.sendManual = () => {
+    const name  = document.getElementById("m-name").value.trim();
+    const value = document.getElementById("m-value").value;
+    const type  = document.getElementById("m-type").value;
+    const src   = document.getElementById("m-source").value.trim();
+    if (!name) return alert("Event name required");
+    tracker.track(name, {
+      eventValue: value !== "" ? Number(value) : null,
+      type,
+      ...(src ? { source: src } : {}),
+    });
+  };
+
+  window.identifyUser = () => {
+    const uid = document.getElementById("i-uid").value.trim();
+    if (!uid) return alert("Enter a user ID");
+    tracker.identify(uid);
+    document.getElementById("info").textContent =
+      `visitorId: ${tracker.visitorId}   |   sessionId: ${tracker.sessionId}   |   source: ${tracker.source}`;
+    logEvent({ _type: "identify", userId: uid });
+  };
+
+  window.simulateNav = () => {
+    history.pushState({}, "", "/checkout");
+  };
+
+  function logEvent(event) {
+    const log = document.getElementById("log");
+    const isAuto   = ["page_view","session_end"].includes(event.eventName);
+    const isAttr   = event.element !== undefined;
+    const isIdent  = event._type === "identify";
+
+    const tag = isIdent ? `<span class="tag tag-auto">identify</span>`
+              : isAuto  ? `<span class="tag tag-auto">auto</span>`
+              : isAttr  ? `<span class="tag tag-attr">attr</span>`
+              :           `<span class="tag tag-manual">manual</span>`;
+
+    const label = event._type === "identify"
+      ? `Identified as: ${event.userId}`
+      : `${event.eventName}  |  type: ${event.type || "—"}  |  value: ${event.eventValue ?? "—"}  |  source: ${event.source || "—"}  |  page: ${event.page || "—"}`;
+
+    const div = document.createElement("div");
+    div.innerHTML = `${tag} ${label}`;
+    if (log.firstChild?.style?.color) log.innerHTML = "";
+    log.prepend(div);
+  }
+
+  window.clearLog = () => {
+    document.getElementById("log").innerHTML = '<div style="color:#6366f1">Cleared.</div>';
+  };
+</script>
+</body>
+</html>
